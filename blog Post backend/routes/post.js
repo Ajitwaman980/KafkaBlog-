@@ -15,5 +15,5 @@ router.put("/update/:id", Authverify, updatePost);
 router.delete("/delete/:id", Authverify, deletePost);
 // comments controller
 router.post("/:postId/comments", Authverify, addComment);
-router.delete("/:postId/comments/:commentId", deleteComment);
+router.delete("/:postId/comments/:commentId", Authverify, deleteComment);
 export default router;

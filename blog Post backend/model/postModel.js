@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 
-console.log("working the backend 2");
+// console.log("working the backend 2");
 
 const postSchema = new mongoose.Schema(
   {

@@ -1,9 +1,18 @@
 import PostService from "../model/postModel.js";
+import redis from "../config/redis.js";
 export const Allpost = async (req, res) => {
   try {
+    // Check if posts are cached in Redis
+    const cachedPosts = await redis.get("posts");
+    if (cachedPosts) {
+      console.log("Fetching posts from Redis cache");
+      return res.json(JSON.parse(cachedPosts));
+    }
+    console.log("Fetching posts from MongoDB");
+    // If not cached, fetch from MongoDB
     const posts = await PostService.find({});
-
-    console.log("this is post", posts);
+    await redis.set("posts", JSON.stringify(posts), "EX", 3600);
+    // console.log("this is post", posts);
     res.json(posts);
   } catch (err) {
     console.error(err);
@@ -15,7 +24,7 @@ export const Newpost = async (req, res) => {
     const { title, content, category } = req.body;
     const { id: userId, username, email } = req.user;
     // console.log("this is username is ", username);
-
+    await redis.del("posts");
     const userPost = new PostService({
       title,
       content,
@@ -37,6 +46,7 @@ export const Newpost = async (req, res) => {
 
 export const updatePost = async (req, res) => {
   try {
+    await redis.del("posts");
     const postId = req.params.id;
     const { title, content } = req.body;
 
@@ -55,6 +65,7 @@ export const updatePost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
+    await redis.del("posts");
     const postId = req.params.id;
 
     await PostService.findByIdAndDelete(postId);

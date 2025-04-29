@@ -1,13 +1,13 @@
 import express, { json } from "express";
-import zod from "zod";
-import mongoose from "mongoose";
+
 import jwt from "jsonwebtoken";
 // import cookie_parser from "cookies-parser";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcrypt";
 import Authverify from "./src/middleware/auth.js";
-import cors from "cors";
+// import cors from "cors";
 import { Kafka } from "kafkajs";
+import { usermodel } from "./model/user.js";
 const app = express();
 // cors
 // app.use(
@@ -19,31 +19,15 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 // Connect to MongoDB
-mongoose
-  .connect("mongodb://localhost/microservices_user_services")
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch(() => {
-    console.error("Failed to connect to MongoDB");
-  });
 
 //   user schema
 
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, minlength: 3, maxlength: 20 },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true, minlength: 8, maxlength: 100 },
-});
-
-const UserService = mongoose.model("User", userSchema);
-export default UserService;
 //   user sign up
 app.post("/signup", async (req, res) => {
   try {
     const { username, password, email } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const newUser = new UserService({
+    const newUser = new usermodel({
       username,
       password: hashedPassword,
       email,
@@ -51,7 +35,7 @@ app.post("/signup", async (req, res) => {
 
     await newUser.save();
     const token = jwt.sign(
-      { id: newUser._id, username: user.username, email: user.email },
+      { id: newUser._id, username: newUser.username, email: newUser.email },
       "myscert"
     );
     res.cookie("token", token);
@@ -68,7 +52,7 @@ app.post("/signup", async (req, res) => {
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await UserService.findOne({ email });
+    const user = await usermodel.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -100,7 +84,7 @@ app.get("/logout", Authverify, function (req, res) {
 app.get("/profile", Authverify, async function (req, res) {
   try {
     const id = req.user.id;
-    const userProfile = await UserService.findById(id);
+    const userProfile = await usermodel.findById(id);
     if (!userProfile)
       return res.status(404).json({ message: "User not found" });
     res.json({ userProfile: userProfile });
