@@ -11,6 +11,7 @@ export const Allpost = async (req, res) => {
     console.log("Fetching posts from MongoDB");
     // If not cached, fetch from MongoDB
     const posts = await PostService.find({});
+    // Cache the posts in Redis for 1 hour
     await redis.set("posts", JSON.stringify(posts), "EX", 3600);
     // console.log("this is post", posts);
     res.json(posts);
@@ -38,6 +39,25 @@ export const Newpost = async (req, res) => {
     await userPost.save();
 
     res.json(userPost);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// get element by id
+export const getPostById = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    if (!postId) {
+      return res.status(400).json({ message: "Post ID is required" });
+    }
+
+    const post = await PostService.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json(post);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });

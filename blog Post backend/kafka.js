@@ -4,7 +4,8 @@ const kafka = new Kafka({
   brokers: ["localhost:9092"],
   clientId: "post-service",
 });
-
+//  asynchronous talking with backend 2  authentication service
+//  and redis for caching the data
 export const consumer = kafka.consumer({ groupId: "post-group" });
 const startKafkaConsumer = async () => {
   try {
@@ -17,9 +18,9 @@ const startKafkaConsumer = async () => {
       eachMessage: async ({ topic, partition, message }) => {
         const { userId, token } = JSON.parse(message.value.toString());
         // console.log(`Received message: ${message.value.toString()}`);
-        console.log("this is topic ", topic);
-        console.log("this is token of user ", token);
-        console.log("this is userId ", userId);
+        // console.log("this is topic ", topic);
+        // console.log("this is token of user ", token);
+        // console.log("this is userId ", userId);
         // Userlogin event
         if (topic === "Userlogin" || topic === "usercreated_event") {
           // Store token in Redis with 1-hour expiry
@@ -29,7 +30,7 @@ const startKafkaConsumer = async () => {
       },
     });
   } catch (err) {
-    console.error("Error in Kafka Consumer:", err);
+    // console.error("Error in Kafka Consumer:", err);
     setTimeout(startKafkaConsumer, 5000); // Retry after 5 seconds
   }
 };
