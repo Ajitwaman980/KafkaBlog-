@@ -51,3 +51,6 @@ docker run -p 9092:9092 apache/kafka:3.7.1
 
 # Start Redis (optional, if used for caching or session management)
 docker run -p 6379:6379 redis
+
+![kafka](https://github.com/user-attachments/assets/13089930-201a-4232-b8dc-96ca0d7beac2)
+
