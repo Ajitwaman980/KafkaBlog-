@@ -20,7 +20,11 @@ app.use(express.json());
 app.use(cookieParser());
 // Connect to MongoDB
 
-//   user schema
+//   test connection
+
+app.get("/test", (req, res) => {
+  res.json({ message: "User service is running" });
+});
 
 //   user sign up
 app.post("/signup", async (req, res) => {

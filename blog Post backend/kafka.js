@@ -30,8 +30,9 @@ const startKafkaConsumer = async () => {
       },
     });
   } catch (err) {
-    // console.error("Error in Kafka Consumer:", err);
+    console.error("Error in Kafka Consumer:", err);
     setTimeout(startKafkaConsumer, 5000); // Retry after 5 seconds
+    // process.exit(1); // Exit the process on error
   }
 };
 

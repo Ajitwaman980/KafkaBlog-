@@ -23,7 +23,8 @@ export const Authverify = async (req, res, next) => {
     // console.log("----------------------------");
     // console.log("id is the ", userId);
     // data tooken and user validation
-    const cachedToken = await redis.get(userId);
+    const cachedToken = await redis.get(userId); // user id is the key
+    // console.log("cached token is the ", cachedToken);
     console.log("data is the ", cachedToken);
     console.log("----------------------------");
     if (!cachedToken || cachedToken !== token) {

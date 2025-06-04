@@ -13,7 +13,16 @@ app.use(cookieParser()); //cookies parser
 connectToDatabase();
 
 // Start Kafka Consumer
-startKafkaConsumer();
+
+startKafkaConsumer().catch((err) => {
+  console.error("Error starting Kafka Consumer:", err);
+});
+
+// testing
+
+app.get("/test", (req, res) => {
+  res.json({ message: "Blog Post service is running" });
+});
 
 // middleware routes
 app.use("/posts", postRoutes);
